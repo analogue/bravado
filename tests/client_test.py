@@ -305,13 +305,17 @@ def swagger_client():
             }
         }
     }
-    return SwaggerClient(Spec.from_dict(spec_dict, 'http://example.com/'))
-
-
-def test_client_ignores_unexpecte_response_fields(swagger_client):
-    swagger_client.swagger_spec.http_client = MockHttpClient({
+    http_client = MockHttpClient({
         "id": 12345,
         "alias": "thing",
     })
+    return SwaggerClient(Spec.from_dict(
+        spec_dict,
+        origin_url='http://example.com/',
+        http_client=http_client,
+        config={'use_models': False}))
+
+
+def test_client_ignores_unexpected_response_fields(swagger_client):
     response = swagger_client.pet.getPet()
     assert response.result() == dict(id=12345)
